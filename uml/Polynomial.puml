@@ -1,0 +1,38 @@
+@startuml
+title Диаграмма классов: Polynomial (вариант 5), версия v0.1
+skinparam classAttributeIconSize 0
+hide empty members
+
+class Polynomial {
+  - a_ : double
+  - b_ : double
+  - c_ : double
+  - {static} rootSearchCount_ : int
+  - {static} existingCount_ : int
+  --
+  + {static} INFINITE_ROOTS : int = -1
+  + Polynomial()
+  + Polynomial(a : double, b : double, c : double)
+  + Polynomial(other : Polynomial)
+  + operator=(other : Polynomial) : Polynomial
+  + ~Polynomial()
+  + getA() : double
+  + getB() : double
+  + getC() : double
+  + valueAt(x : double) : double
+  + findRoots(x1 : double, x2 : double) : int
+  + toString() : std::string
+  + {static} getRootSearchCount() : int
+  + {static} getExistingCount() : int
+}
+
+note right of Polynomial
+  Многочлен ax² + bx + c.
+  Инвариант: a, b, c - конечные числа.
+  findRoots() увеличивает rootSearchCount_,
+  деструктор уменьшает existingCount_.
+end note
+
+note "operator<<(out : std::ostream, p : Polynomial) : std::ostream\n(свободная функция)" as N1
+N1 .. Polynomial
+@enduml
