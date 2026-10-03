@@ -1,5 +1,5 @@
 @startuml
-title Диаграмма классов: Polynomial (вариант 5), версия v0.2
+title Диаграмма классов: Polynomial (вариант 5), версия v1.0
 skinparam classAttributeIconSize 0
 hide empty members
 
@@ -9,6 +9,7 @@ class Polynomial {
   - c_ : double
   - {static} rootSearchCount_ : int
   - {static} existingCount_ : int
+  - {static} comparePoint_ : double
   --
   + {static} INFINITE_ROOTS : int = -1
   + Polynomial()
@@ -25,6 +26,8 @@ class Polynomial {
   + toString() : std::string
   + {static} getRootSearchCount() : int
   + {static} getExistingCount() : int
+  + {static} setComparePoint(x : double) : void
+  + {static} getComparePoint() : double
   .. унарные операции ..
   + operator++() : Polynomial
   + operator++(int) : Polynomial
@@ -51,6 +54,10 @@ note right of Polynomial
   operator-(lhs, rhs)  ->  lhs -= rhs
   operator*(lhs, k), operator*(k, rhs)  ->  *= k
   operator/(lhs, k)  ->  lhs /= k
+
+  Сравнения (дружественные функции) - значения
+  в точке comparePoint_: <, >, <=, >=, ==, !=
+  (> через <, <= и >= через отрицание, != через ==)
   operator<<(out, p) - вывод в поток
 end note
 @enduml

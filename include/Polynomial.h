@@ -5,7 +5,7 @@
  * пример работы — на странице @ref part1.
  * @author Vareshka86
  * @date 2026-10-03
- * @version 0.2
+ * @version 1.0
  */
 
 #ifndef POLYNOMIAL_H
@@ -28,9 +28,13 @@
  * `*=` и `/=` умножают и делят на число; бинарные `+`, `-`, `*`, `/` реализованы через
  * составное присваивание. Описание — на странице @ref part2.
  *
+ * Сравнения `<`, `>`, `<=`, `>=`, `==`, `!=` (часть 3) сравнивают значения многочленов
+ * в общей точке x₀ — см. страницу @ref part3.
+ *
  * Статические поля общие для всех многочленов:
  * - rootSearchCount_ — сколько раз с запуска программы искали корни (требование варианта 5);
- * - existingCount_ — сколько многочленов существует сейчас; его уменьшает деструктор.
+ * - existingCount_ — сколько многочленов существует сейчас; его уменьшает деструктор;
+ * - comparePoint_ — точка x₀, в которой сравниваются многочлены.
  */
 class Polynomial
 {
@@ -249,6 +253,76 @@ public:
     friend Polynomial operator/(Polynomial lhs, double k);
 
     /**
+     * @brief Меньше: `p < q`, если P(x₀) < Q(x₀).
+     * @details Все шесть сравнений сравнивают **значения** многочленов в общей точке
+     * сравнения x₀ (статическое поле comparePoint_, задаётся setComparePoint()),
+     * как требует вариант 5. Значения считаются равными, если различаются меньше
+     * чем на 10⁻¹³ относительно их величины: дробные вычисления дают погрешность.
+     * Все сравнения выражены через одну функцию, поэтому всегда согласованы:
+     * для любых p и q верно ровно одно из `p < q`, `p == q`, `p > q`.
+     * @param lhs Левый многочлен.
+     * @param rhs Правый многочлен.
+     * @return true, если значение lhs в точке x₀ меньше значения rhs.
+     */
+    friend bool operator<(const Polynomial& lhs, const Polynomial& rhs);
+
+    /**
+     * @brief Больше: `p > q`, если P(x₀) > Q(x₀).
+     * @param lhs Левый многочлен.
+     * @param rhs Правый многочлен.
+     * @return true, если значение lhs в точке x₀ больше.
+     */
+    friend bool operator>(const Polynomial& lhs, const Polynomial& rhs);
+
+    /**
+     * @brief Меньше или равно: `p <= q` — то же, что «не больше».
+     * @param lhs Левый многочлен.
+     * @param rhs Правый многочлен.
+     * @return true, если P(x₀) ≤ Q(x₀).
+     */
+    friend bool operator<=(const Polynomial& lhs, const Polynomial& rhs);
+
+    /**
+     * @brief Больше или равно: `p >= q` — то же, что «не меньше».
+     * @param lhs Левый многочлен.
+     * @param rhs Правый многочлен.
+     * @return true, если P(x₀) ≥ Q(x₀).
+     */
+    friend bool operator>=(const Polynomial& lhs, const Polynomial& rhs);
+
+    /**
+     * @brief Равно: `p == q`, если значения в точке x₀ совпадают.
+     * @details Сравниваются значения, а не коэффициенты: разные многочлены могут
+     * быть «равны» в данной точке (например, x² и x в точке 1).
+     * @param lhs Левый многочлен.
+     * @param rhs Правый многочлен.
+     * @return true, если P(x₀) = Q(x₀) с учётом погрешности.
+     */
+    friend bool operator==(const Polynomial& lhs, const Polynomial& rhs);
+
+    /**
+     * @brief Не равно: `p != q` — отрицание `==`.
+     * @param lhs Левый многочлен.
+     * @param rhs Правый многочлен.
+     * @return true, если значения в точке x₀ различаются.
+     */
+    friend bool operator!=(const Polynomial& lhs, const Polynomial& rhs);
+
+    /**
+     * @brief Задаёт точку x₀, в которой сравниваются многочлены.
+     * @details Статический метод: точка одна для всех многочленов.
+     * @param x Новая точка сравнения.
+     * @exception std::invalid_argument Если x — бесконечность или «не число».
+     */
+    static void setComparePoint(double x);
+
+    /**
+     * @brief Возвращает текущую точку сравнения x₀.
+     * @return Точка сравнения (по умолчанию 0).
+     */
+    static double getComparePoint();
+
+    /**
      * @brief Возвращает, сколько раз с запуска программы искали корни.
      * @return Значение статического счётчика rootSearchCount_.
      */
@@ -275,6 +349,7 @@ private:
 
     static int rootSearchCount_; ///< Сколько раз вызывали findRoots() (общее для всех объектов)
     static int existingCount_;   ///< Сколько объектов Polynomial существует сейчас
+    static double comparePoint_; ///< Точка x₀, в которой сравниваются многочлены (общая для всех)
 
     double a_; ///< Коэффициент при x²
     double b_; ///< Коэффициент при x
