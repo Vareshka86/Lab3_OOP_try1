@@ -1,5 +1,5 @@
 @startuml
-title Диаграмма классов: Polynomial (вариант 5), версия v0.1
+title Диаграмма классов: Polynomial (вариант 5), версия v0.2
 skinparam classAttributeIconSize 0
 hide empty members
 
@@ -16,6 +16,7 @@ class Polynomial {
   + Polynomial(other : Polynomial)
   + operator=(other : Polynomial) : Polynomial
   + ~Polynomial()
+  .. чтение ..
   + getA() : double
   + getB() : double
   + getC() : double
@@ -24,6 +25,18 @@ class Polynomial {
   + toString() : std::string
   + {static} getRootSearchCount() : int
   + {static} getExistingCount() : int
+  .. унарные операции ..
+  + operator++() : Polynomial
+  + operator++(int) : Polynomial
+  + operator--() : Polynomial
+  + operator--(int) : Polynomial
+  .. арифметическое присваивание ..
+  + operator+=(other : Polynomial) : Polynomial
+  + operator-=(other : Polynomial) : Polynomial
+  + operator*=(k : double) : Polynomial
+  + operator/=(k : double) : Polynomial
+  .. служебное ..
+  - setCoefficients(a : double, b : double, c : double) : void
 }
 
 note right of Polynomial
@@ -31,8 +44,13 @@ note right of Polynomial
   Инвариант: a, b, c - конечные числа.
   findRoots() увеличивает rootSearchCount_,
   деструктор уменьшает existingCount_.
-end note
 
-note "operator<<(out : std::ostream, p : Polynomial) : std::ostream\n(свободная функция)" as N1
-N1 .. Polynomial
+  Бинарные операции (дружественные функции)
+  реализованы через составное присваивание:
+  operator+(lhs, rhs)  ->  lhs += rhs
+  operator-(lhs, rhs)  ->  lhs -= rhs
+  operator*(lhs, k), operator*(k, rhs)  ->  *= k
+  operator/(lhs, k)  ->  lhs /= k
+  operator<<(out, p) - вывод в поток
+end note
 @enduml
