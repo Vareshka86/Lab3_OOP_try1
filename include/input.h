@@ -43,4 +43,15 @@ int readInt(const std::string& prompt);
  */
 int readIntInRange(const std::string& prompt, int minValue, int maxValue);
 
+/**
+ * @brief Считывает с клавиатуры одно число с дробной частью (double).
+ * @details Как и readInt(), читает всю строку и принимает её, только если в
+ * ней ровно одно число. Дробную часть можно отделять точкой или запятой:
+ * «2.5» и «2,5» — одно и то же. Бесконечность и «не число» не принимаются.
+ * @param prompt Текст приглашения к вводу.
+ * @return Введённое конечное число.
+ * @exception std::runtime_error Если поток ввода закончился.
+ */
+double readDouble(const std::string& prompt);
+
 #endif // INPUT_H
