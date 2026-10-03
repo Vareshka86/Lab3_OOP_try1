@@ -3,7 +3,7 @@
  * @brief Реализация класса Polynomial.
  * @author Vareshka86
  * @date 2026-10-03
- * @version 0.1
+ * @version 0.2
  */
 
 #include "Polynomial.h"
@@ -187,6 +187,114 @@ std::string Polynomial::toString() const
     appendTerm(result, b_, "x");
     appendTerm(result, c_, "");
     return result.empty() ? "0" : result;
+}
+
+void Polynomial::setCoefficients(double a, double b, double c)
+{
+    // Сначала проверка, потом запись: при ошибке поля остаются прежними
+    if (!std::isfinite(a) || !std::isfinite(b) || !std::isfinite(c))
+    {
+        throw std::overflow_error("результат слишком велик: коэффициент перестал быть конечным числом");
+    }
+    a_ = a;
+    b_ = b;
+    c_ = c;
+}
+
+Polynomial& Polynomial::operator++()
+{
+    setCoefficients(a_ + 1.0, b_ + 1.0, c_ + 1.0);
+    return *this; // ссылка на сам объект - уже изменённый
+}
+
+Polynomial Polynomial::operator++(int)
+{
+    Polynomial old(*this); // копия прежнего значения (конструктор копирования)
+    ++(*this);             // увеличиваем через префиксную форму - логика в одном месте
+    return old;            // возвращаем прежнее значение
+}
+
+Polynomial& Polynomial::operator--()
+{
+    setCoefficients(a_ - 1.0, b_ - 1.0, c_ - 1.0);
+    return *this;
+}
+
+Polynomial Polynomial::operator--(int)
+{
+    Polynomial old(*this);
+    --(*this);
+    return old;
+}
+
+Polynomial& Polynomial::operator+=(const Polynomial& other)
+{
+    setCoefficients(a_ + other.a_, b_ + other.b_, c_ + other.c_);
+    return *this;
+}
+
+Polynomial& Polynomial::operator-=(const Polynomial& other)
+{
+    setCoefficients(a_ - other.a_, b_ - other.b_, c_ - other.c_);
+    return *this;
+}
+
+Polynomial& Polynomial::operator*=(double k)
+{
+    if (!std::isfinite(k))
+    {
+        throw std::invalid_argument("множитель должен быть конечным числом");
+    }
+    setCoefficients(a_ * k, b_ * k, c_ * k);
+    return *this;
+}
+
+Polynomial& Polynomial::operator/=(double k)
+{
+    if (!std::isfinite(k))
+    {
+        throw std::invalid_argument("делитель должен быть конечным числом");
+    }
+    if (k == 0.0)
+    {
+        throw std::invalid_argument("деление на ноль");
+    }
+    setCoefficients(a_ / k, b_ / k, c_ / k);
+    return *this;
+}
+
+// Бинарные операции - через составное присваивание, как требует задание.
+// Левый операнд передан ПО ЗНАЧЕНИЮ: это уже копия, её можно менять и вернуть,
+// а исходный многочлен вызывающей стороны остаётся прежним.
+
+Polynomial operator+(Polynomial lhs, const Polynomial& rhs)
+{
+    lhs += rhs;
+    return lhs;
+}
+
+Polynomial operator-(Polynomial lhs, const Polynomial& rhs)
+{
+    lhs -= rhs;
+    return lhs;
+}
+
+Polynomial operator*(Polynomial lhs, double k)
+{
+    lhs *= k;
+    return lhs;
+}
+
+Polynomial operator*(double k, Polynomial rhs)
+{
+    rhs *= k; // умножение на число перестановочно: k * p == p * k
+    return rhs;
+}
+
+Polynomial operator/(Polynomial lhs, double k)
+{
+    lhs /= k;
+    return lhs;
 }
 
 int Polynomial::getRootSearchCount()
