@@ -65,7 +65,7 @@ HAVE_DOT               = NO    # Graphviz не используется
 # Строки Graphviz - только после его установки.
 # Подробности - references/classes-labs.md скилла lab-part.
 #---------------------------------------------------------------------------
-# IMAGE_PATH           = uml   # для картинок uml/*.png на страницах
+IMAGE_PATH             = uml   # для картинок uml/*.png на страницах
 # HAVE_DOT             = YES   # графы наследования - нужен Graphviz
 # DOT_PATH             = <папка с dot.exe>
 # UML_LOOK             = YES
