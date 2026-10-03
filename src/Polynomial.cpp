@@ -3,7 +3,7 @@
  * @brief Реализация класса Polynomial.
  * @author Vareshka86
  * @date 2026-10-03
- * @version 0.2
+ * @version 1.0
  */
 
 #include "Polynomial.h"
@@ -16,6 +16,7 @@
 // В C++14 статическое поле объявляется в классе, а определяется здесь, в .cpp.
 int Polynomial::rootSearchCount_ = 0;
 int Polynomial::existingCount_ = 0;
+double Polynomial::comparePoint_ = 0.0;
 
 /// Вспомогательные функции, видимые только внутри этого файла.
 namespace
@@ -295,6 +296,84 @@ Polynomial operator/(Polynomial lhs, double k)
 {
     lhs /= k;
     return lhs;
+}
+
+/// Вспомогательная функция сравнений, видимая только внутри этого файла.
+namespace
+{
+
+/// Относительная точность сравнения значений: 10⁻¹³ от величины чисел.
+const double COMPARE_TOLERANCE = 1e-13;
+
+/**
+ * @brief Сравнивает два числа с учётом погрешности дробных вычислений.
+ * @details Числа считаются равными, если различаются меньше чем на
+ * COMPARE_TOLERANCE от большего по модулю (но не меньше чем на 10⁻¹³ абсолютно):
+ * так 0,1 + 0,2 и 0,3 считаются равными.
+ * @param left  Первое число.
+ * @param right Второе число.
+ * @return -1, если left меньше; 0, если равны; 1, если left больше.
+ */
+int compareValues(double left, double right)
+{
+    const double scale = std::fmax(1.0, std::fmax(std::fabs(left), std::fabs(right)));
+    const double difference = left - right;
+    if (std::fabs(difference) <= COMPARE_TOLERANCE * scale)
+    {
+        return 0;
+    }
+    return difference < 0.0 ? -1 : 1;
+}
+
+} // namespace
+
+// Все шесть сравнений - через одну функцию сравнения значений в точке x₀,
+// поэтому они всегда согласованы между собой
+
+bool operator<(const Polynomial& lhs, const Polynomial& rhs)
+{
+    const double x = Polynomial::comparePoint_;
+    return compareValues(lhs.valueAt(x), rhs.valueAt(x)) < 0;
+}
+
+bool operator>(const Polynomial& lhs, const Polynomial& rhs)
+{
+    return rhs < lhs; // p > q - это то же, что q < p
+}
+
+bool operator<=(const Polynomial& lhs, const Polynomial& rhs)
+{
+    return !(lhs > rhs); // «меньше или равно» - это «не больше»
+}
+
+bool operator>=(const Polynomial& lhs, const Polynomial& rhs)
+{
+    return !(lhs < rhs); // «больше или равно» - это «не меньше»
+}
+
+bool operator==(const Polynomial& lhs, const Polynomial& rhs)
+{
+    const double x = Polynomial::comparePoint_;
+    return compareValues(lhs.valueAt(x), rhs.valueAt(x)) == 0;
+}
+
+bool operator!=(const Polynomial& lhs, const Polynomial& rhs)
+{
+    return !(lhs == rhs);
+}
+
+void Polynomial::setComparePoint(double x)
+{
+    if (!std::isfinite(x))
+    {
+        throw std::invalid_argument("точка сравнения должна быть конечным числом");
+    }
+    comparePoint_ = x;
+}
+
+double Polynomial::getComparePoint()
+{
+    return comparePoint_;
 }
 
 int Polynomial::getRootSearchCount()
