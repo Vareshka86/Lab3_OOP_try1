@@ -8,6 +8,7 @@
 
 #include "input.h"
 
+#include <cmath>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -56,5 +57,42 @@ int readIntInRange(const std::string& prompt, int minValue, int maxValue)
 
         std::cout << "Ошибка: число должно быть в диапазоне от " << minValue
                   << " до " << maxValue << ". Попробуйте ещё раз.\n";
+    }
+}
+
+double readDouble(const std::string& prompt)
+{
+    std::string line;
+
+    while (true)
+    {
+        std::cout << prompt;
+
+        if (!std::getline(std::cin, line))
+        {
+            throw std::runtime_error("ввод данных прерван (достигнут конец потока)");
+        }
+
+        // В России дробную часть часто отделяют запятой: «2,5» читаем как 2.5
+        for (char& ch : line)
+        {
+            if (ch == ',')
+            {
+                ch = '.';
+            }
+        }
+
+        std::istringstream stream{line};
+        double value{};
+        char extra{};
+
+        // Корректно: число прочиталось, после него ничего нет, и оно конечное
+        // (не бесконечность и не «не число» - их оператор >> тоже может вернуть)
+        if ((stream >> value) && !(stream >> extra) && std::isfinite(value))
+        {
+            return value;
+        }
+
+        std::cout << "Ошибка: нужно ввести одно число (например, 2 или -1.5). Попробуйте ещё раз.\n";
     }
 }
